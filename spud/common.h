@@ -7,6 +7,8 @@
 
 #ifdef _DEBUG
 #define DBGPRINTF(...) printf(__VA_ARGS__)
+#else
+#define DBGPRINTF(...)
 #endif
 
 void fail(const char *a, ...);
