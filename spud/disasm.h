@@ -171,7 +171,7 @@
 typedef struct _instr_t
 {
 	//Instruction name.
-	char *name;
+	const char *name;
 	//Instruction type (SPU_INSTR_...).
 	int type;
 	//Instruction (INSTR_...).

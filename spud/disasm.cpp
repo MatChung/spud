@@ -2034,7 +2034,7 @@ static instr_t instr_rotqbii(u32 rt, u32 ra, u32 i7)
 }
 
 static const struct {
-	char *name;
+	const char *name;
 	int type;
 	int instr;
 	void *ptr;
