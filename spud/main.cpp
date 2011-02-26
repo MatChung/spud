@@ -3,6 +3,7 @@
 // http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt
 
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "spud.h"
 #include "disasm.h"
