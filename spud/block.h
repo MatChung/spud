@@ -5,4 +5,11 @@
 #ifndef _BLOCK_H_
 #define _BLOCK_H_
 
+#include "disasm.h"
+
+#define BLOCKSADDR(bl) IIDX2ADDR(bl->sr->er, bl->sidx)
+#define BLOCKEADDR(bl) IIDX2ADDR(bl->sr->er, bl->eidx)
+
+void block_extract_all(subroutine_t *sr);
+
 #endif

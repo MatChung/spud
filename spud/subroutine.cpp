@@ -6,6 +6,7 @@
 #include "disasm.h"
 #include "spud.h"
 #include "subroutine.h"
+#include "block.h"
 
 static void _subroutine_find_refs(ctxt_t *ctxt, subroutine_t *sr)
 {
@@ -18,12 +19,12 @@ static void _subroutine_find_refs(ctxt_t *ctxt, subroutine_t *sr)
 		//Check all instructions.
 		for(j = tsr->sidx; j <= tsr->eidx; j++)
 		{
-			instr_t *inst = &(tsr->execr->instrs[j]);
+			instr_t *inst = &(tsr->er->instrs[j]);
 			//Check for a relative branch to start of subroutine.
-			if(disasm_is_direct_branch(inst) && BRANCH_TARGET(inst) == IIDX2ADDR(sr->execr, sr->sidx))
+			if(disasm_is_direct_branch(inst) && BRANCH_TARGET(inst) == IIDX2ADDR(sr->er, sr->sidx))
 			{
 				DBGPRINTF("subroutine: found ref from sub @ 0x%05x (instr @ 0x%05x) to 0x%05x\n", 
-					SUBSADDR(tsr), IIDX2ADDR(tsr->execr, j), SUBSADDR(sr));
+					SUBSADDR(tsr), IIDX2ADDR(tsr->er, j), SUBSADDR(sr));
 				//Add reference to referenced subroutine.
 				reference_t *ref = new reference_t;
 				ref->subroutine = tsr;
@@ -48,22 +49,31 @@ static void _subroutine_find_refs_all(ctxt_t *ctxt)
 		_subroutine_find_refs(ctxt, ctxt->subroutines[i]);
 }
 
-static subroutine_t *_subroutine_extract(execr_t *er, int sidx)
+static subroutine_t *_subroutine_extract(execr_t *er, unsigned int sidx)
 {
-	unsigned int j;
+	unsigned int i;
 
-	for(j = sidx; j < er->instrs.size(); j++)
+	for(i = sidx; i < er->instrs.size(); i++)
 	{
-		instr_t *inst = &(er->instrs[j]);
+		instr_t *inst = &(er->instrs[i]);
 		//Try to find a bi $lr instruction for now.
 		//A subroutine could also have more than one bi $lr, check this later.
-		if(inst->instr == INSTR_BI && inst->rr.rt == REG_LR)
+		//Also check for stop instruction as subroutine end.
+		if((inst->instr == INSTR_BI && inst->rr.rt == REG_LR) ||
+			inst->instr == INSTR_STOP)
 		{
 			subroutine_t *res = new subroutine_t;
-			res->execr = er;
+			res->er = er;
 			res->sidx = sidx;
-			res->eidx = j;
+			res->eidx = i;
+			res->cfg = NULL;
 			return res;
+		}
+		//Discard subroutines with unknown instructions.
+		if(inst->instr == INSTR_NONE)
+		{
+			DBGPRINTF("subroutine: unknown instruction @ 0x%05x\n", IIDX2ADDR(er, i));
+			return NULL;
 		}
 	}
 
@@ -78,7 +88,7 @@ subroutine_t *subroutine_find_tsubref(subroutine_t *sr, u32 addr)
 	{
 		reference_t *ref = sr->tsubrefs[i];
 		//Check if the address matches a subroutine reference.
-		if(IIDX2ADDR(ref->subroutine->execr, ref->refidx) == addr)
+		if(IIDX2ADDR(ref->subroutine->er, ref->refidx) == addr)
 			return ref->subroutine;
 	}
 
@@ -97,17 +107,20 @@ void subroutine_extract_all(ctxt_t *ctxt)
 		//Check all instructions.
 		while(j < er->instrs.size())
 		{
-			//Ignore nops.
-			if(er->instrs[j].instr != INSTR_NOP && er->instrs[j].instr != INSTR_LNOP)
+			instr_t *inst = &(er->instrs[j]);
+			//Ignore nops and unknown instructions.
+			if(inst->instr != INSTR_NOP && 
+				inst->instr != INSTR_LNOP &&
+				inst->instr != INSTR_NONE)
 			{
 				//Extract next subroutine.
 				subroutine_t *sr = _subroutine_extract(er, j);
 				if(sr != NULL)
 				{
 					DBGPRINTF("subroutine: found sub @ 0x%05x (end @ 0x%05x)\n", SUBSADDR(sr), SUBEADDR(sr));
+					ctxt->subroutines.push_back(sr);
 					//Move instruction index to subroutine end.
 					j = sr->eidx;
-					ctxt->subroutines.push_back(sr);
 				}
 			}
 			j++;
@@ -126,4 +139,8 @@ void subroutine_extract_all(ctxt_t *ctxt)
 		DBGPRINTF("subroutine: sub @ 0x%05x is %s\n", 
 			SUBSADDR(sr), (sr->reachable == true ? "reachable" : "not reachable"));
 	}
+
+	//Extract all blocks.
+	for(i = 0; i < ctxt->subroutines.size(); i++)
+		block_extract_all(ctxt->subroutines[i]);
 }

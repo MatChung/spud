@@ -37,6 +37,7 @@ static void _elf_load_phdr(ctxt_t *ctxt, FILE *fp, u32 phdr_offset, u32 i)
 	if(flags & 0x1)
 	{
 		execr_t *er = new execr_t;
+		er->ctxt = ctxt;
 		er->start = paddr;
 		er->size = size;
 		ctxt->execrs.push_back(er);

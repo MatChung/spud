@@ -2,52 +2,168 @@
 
 sub_00000()
 {
-	asm("stqd     $1, $1, -0x40");
-	asm("ai       $1, $1, -0x40");
-	asm("lqd      $2, $1, 0x30");
-	asm("cwd      $5, $1, 0x0");
-	asm("shufb    $2, $3, $2, $5");
-	asm("stqd     $2, $1, 0x30");
-	asm("lqd      $2, $1, 0x20");
-	asm("cwd      $3, $1, 0x0");
-	asm("shufb    $2, $4, $2, $3");
-	asm("stqd     $2, $1, 0x20");
-	asm("lqd      $2, $1, 0x30");
-	$3 = $2 | $0;
-	asm("lqd      $2, $1, 0x20");
-	asm("a        $2, $3, $2");
-	$3 = $2 | $0;
-	asm("ai       $1, $1, 0x40");
-	asm("bi       $0, $0, $0");
+	//block @ 00000
+	{
+		asm("stqd     $1, $1, -0x50");
+		asm("ai       $1, $1, -0x50");
+		asm("lqd      $2, $1, 0x40");
+		asm("cwd      $6, $1, 0x0");
+		asm("shufb    $2, $3, $2, $6");
+		asm("stqd     $2, $1, 0x40");
+		asm("lqd      $2, $1, 0x30");
+		asm("cwd      $3, $1, 0x0");
+		asm("shufb    $2, $4, $2, $3");
+		asm("stqd     $2, $1, 0x30");
+		asm("lqd      $2, $1, 0x20");
+		asm("cwd      $3, $1, 0x0");
+		asm("shufb    $2, $5, $2, $3");
+		asm("stqd     $2, $1, 0x20");
+		asm("br       $0, 0xac");
+	}
+	//block @ 0003c
+	{
+		asm("lqd      $2, $1, 0x30");
+		asm("ai       $3, $2, 0xd");
+		asm("lqd      $2, $2, 0x0");
+		asm("rotqby   $2, $2, $3");
+		asm("ori      $4, $2, 0x0");
+		asm("lqd      $2, $1, 0x40");
+		asm("lqd      $3, $2, 0x0");
+		asm("cbd      $5, $2, 0x0");
+		asm("shufb    $3, $4, $3, $5");
+		asm("stqd     $3, $2, 0x0");
+		asm("lqd      $2, $1, 0x40");
+		asm("ai       $3, $2, 0x1");
+		asm("lqd      $2, $1, 0x40");
+		asm("cwd      $4, $1, 0x0");
+		asm("shufb    $2, $3, $2, $4");
+		asm("stqd     $2, $1, 0x40");
+		asm("lqd      $2, $1, 0x30");
+		asm("ai       $3, $2, 0x1");
+		asm("lqd      $2, $1, 0x30");
+		asm("cwd      $4, $1, 0x0");
+		asm("shufb    $2, $3, $2, $4");
+		asm("stqd     $2, $1, 0x30");
+		asm("lqd      $2, $1, 0x20");
+		asm("ai       $3, $2, -0x1");
+		asm("lqd      $2, $1, 0x20");
+		asm("cwd      $4, $1, 0x0");
+		asm("shufb    $2, $3, $2, $4");
+		asm("stqd     $2, $1, 0x20");
+		asm("lqd      $2, $1, 0x20");
+		asm("cgti     $2, $2, 0x0");
+		asm("brnz     $2, 0x3c");
+	}
+	//block @ 000b8
+	{
+		asm("ai       $1, $1, 0x50");
+		asm("bi       $0, $0, $0");
+	}
 }
 
-sub_00048()
+void _start()
 {
-	asm("stqd     $0, $1, 0x10");
-	asm("stqd     $80, $1, -0x10");
-	asm("stqd     $1, $1, -0x30");
-	asm("ai       $1, $1, -0x30");
-	$3 = 1;
-	$4 = 2;
-	sub_00000();
-	$3 = 2;
-	$4 = 3;
-	sub_00000();
-	$3 = 1;
-	$4 = 2;
-	sub_00000();
-	$80 = $3 | $0;
-	$3 = 2;
-	$4 = 3;
-	sub_00000();
-	$2 = $3 | $0;
-	$3 = $80 | $0;
-	$4 = $2 | $0;
-	sub_00000();
-	asm("stop     ");
-	asm("ai       $1, $1, 0x30");
-	asm("lqd      $80, $1, -0x10");
-	asm("lqd      $0, $1, 0x10");
-	asm("bi       $0, $0, $0");
+	//block @ 000c0
+	{
+		asm("stqd     $0, $1, 0x10");
+		asm("stqd     $1, $1, -0x60");
+		asm("ai       $1, $1, -0x60");
+		asm("lqr      $3, 0x1d0");
+		asm("lqd      $2, $1, 0x20");
+		asm("cdd      $4, $1, 0x0");
+		asm("shufb    $2, $3, $2, $4");
+		asm("stqd     $2, $1, 0x20");
+		asm("il       $3, 0x6132");
+		asm("lqd      $2, $1, 0x20");
+		asm("chd      $4, $1, 0x8");
+		asm("shufb    $2, $3, $2, $4");
+		asm("stqd     $2, $1, 0x20");
+		asm("il       $3, 0x0");
+		asm("lqd      $2, $1, 0x20");
+		asm("cbd      $4, $1, 0xa");
+		asm("shufb    $2, $3, $2, $4");
+		asm("stqd     $2, $1, 0x20");
+		asm("ai       $3, $1, 0x30");
+		asm("ai       $2, $1, 0x20");
+		asm("ori      $4, $2, 0x0");
+		asm("il       $5, 0xb");
+		sub_00000();
+		asm("il       $3, 0x0");
+		asm("lqd      $2, $1, 0x40");
+		asm("cwd      $4, $1, 0x0");
+		asm("shufb    $2, $3, $2, $4");
+		asm("stqd     $2, $1, 0x40");
+		asm("il       $3, 0x0");
+		asm("lqd      $2, $1, 0x50");
+		asm("cwd      $4, $1, 0x0");
+		asm("shufb    $2, $3, $2, $4");
+		asm("stqd     $2, $1, 0x50");
+		asm("br       $0, 0x198");
+	}
+	//block @ 00148
+	{
+		asm("lqd      $2, $1, 0x50");
+		asm("ori      $3, $2, 0x0");
+		asm("lqd      $2, $1, 0x50");
+		asm("mpyh     $5, $3, $2");
+		asm("mpyh     $4, $2, $3");
+		asm("mpyu     $2, $3, $2");
+		asm("a        $3, $5, $4");
+		asm("a        $2, $3, $2");
+		asm("lqd      $3, $1, 0x40");
+		asm("a        $3, $3, $2");
+		asm("lqd      $2, $1, 0x40");
+		asm("cwd      $4, $1, 0x0");
+		asm("shufb    $2, $3, $2, $4");
+		asm("stqd     $2, $1, 0x40");
+		asm("lqd      $2, $1, 0x50");
+		asm("ai       $3, $2, 0x1");
+		asm("lqd      $2, $1, 0x50");
+		asm("cwd      $4, $1, 0x0");
+		asm("shufb    $2, $3, $2, $4");
+		asm("stqd     $2, $1, 0x50");
+		asm("lqd      $2, $1, 0x50");
+		asm("cgti     $2, $2, 0x9");
+		asm("brz      $2, 0x148");
+	}
+	//block @ 001a4
+	{
+		asm("lqd      $2, $1, 0x40");
+		asm("ai       $3, $2, 0x1");
+		asm("lqd      $2, $1, 0x40");
+		asm("cwd      $4, $1, 0x0");
+		asm("shufb    $2, $3, $2, $4");
+		asm("stqd     $2, $1, 0x40");
+		asm("stop     ");
+	}
+}
+
+//Seems to be not reachable.
+sub_001c0()
+{
+	//block @ 001c0
+	{
+		asm("ai       $1, $1, 0x60");
+		asm("lqd      $0, $1, 0x10");
+		asm("bi       $0, $0, $0");
+	}
+}
+
+//Seems to be not reachable.
+sub_001d8()
+{
+	//block @ 001d8
+	{
+		asm("stop     ");
+	}
+}
+
+//Seems to be not reachable.
+sub_001dc()
+{
+	//block @ 001dc
+	{
+		asm("stop     ");
+	}
 }
 

@@ -13,6 +13,8 @@ using std::vector;
 
 typedef struct _execr_t
 {
+	//Owning context.
+	struct _ctxt_t *ctxt;
 	//Start address.
 	u32 start;
 	//Size.
@@ -37,12 +39,16 @@ typedef struct _block_t
 	unsigned int sidx;
 	//End instruction index.
 	unsigned int eidx;
+	//Exit instruction.
+	instr_t *exitinst;
+	//Next block.
+	struct _block_t *next;
 } block_t;
 
 typedef struct _subroutine_t
 {
 	//Owning executable range.
-	execr_t *execr;
+	execr_t *er;
 	//Start instruction index;
 	unsigned int sidx;
 	//End instruction index.
@@ -53,8 +59,10 @@ typedef struct _subroutine_t
 	vector<reference_t *>fsubrefs;
 	//Reference to other subroutines.
 	vector<reference_t *>tsubrefs;
-	//Blocks.
-	vector<block_t *>blocks;
+	//Basic blocks.
+	vector<block_t *>bblocks;
+	//Control flow graph.
+	block_t *cfg;
 } subroutine_t;
 
 typedef struct _ctxt_t

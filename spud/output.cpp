@@ -10,6 +10,37 @@
 #include "disasm.h"
 #include "subroutine.h"
 
+void output_write_block(FILE *fp, block_t *bl)
+{
+	unsigned int i;
+
+	//Write header.
+	fprintf(fp, "\t//block @ %05x\n\t{\n", IIDX2ADDR(bl->sr->er, bl->sidx));
+	//Write instructions for now.
+	for(i = bl->sidx; i <= bl->eidx; i++)
+	{
+		instr_t *inst = &(bl->sr->er->instrs[i]);
+
+		//Check for direct function call.
+		if((inst->instr == INSTR_BR || 
+			inst->instr == INSTR_BRA || 
+			inst->instr == INSTR_BRSL) && 
+			subroutine_find_tsubref(bl->sr, BRANCH_TARGET(inst)) != NULL)
+			fprintf(fp, "\t\tsub_%05x();\n", BRANCH_TARGET(inst));
+		else
+		{
+			//Fallback: output asm statement.
+			fprintf(fp, "\t\tasm(\"");
+			disasm_print_instr(fp, inst, false);
+			fprintf(fp, "\");\n");
+		}
+
+	}
+	//Write footer.
+	//Write footer.
+	fprintf(fp, "\t}\n");
+}
+
 void output_write_subroutine(FILE *fp, subroutine_t *sr)
 {
 	unsigned int i;
@@ -17,42 +48,13 @@ void output_write_subroutine(FILE *fp, subroutine_t *sr)
 	//Write header.
 	if(sr->reachable == false)
 		fprintf(fp, "//Seems to be not reachable.\n");
-	fprintf(fp, "sub_%05x()\n{\n", IIDX2ADDR(sr->execr, sr->sidx));
-	//Write instructions for now.
-	for(i = sr->sidx; i <= sr->eidx; i++)
-	{
-		instr_t *inst = &(sr->execr->instrs[i]);
-
-		//Check for direct function call.
-		if((inst->instr == INSTR_BR || 
-			inst->instr == INSTR_BRA || 
-			inst->instr == INSTR_BRSL))
-		{
-			subroutine_t *tsr = subroutine_find_tsubref(sr, BRANCH_TARGET(inst));
-			if(tsr != NULL)
-				fprintf(fp, "\tsub_%05x();\n", BRANCH_TARGET(inst));
-		}
-		else if(inst->instr == INSTR_ORI)
-		{
-			//Nah we don't do it this way, this is just for testing.
-			//The idea is to write an optimizer that collects and optimizes 
-			//expressions and generates c statements out of them.
-			fprintf(fp, "\t$%d = $%d | $%d;\n", inst->rr.rt, inst->rr.ra, inst->rr.rb);
-		}
-		else if(inst->instr == INSTR_IL)
-		{
-			//The same as above here.
-			fprintf(fp, "\t$%d = %d;\n", inst->ri16.rt, inst->ri16.i16);
-		}
-		else
-		{
-			//Fallback: output asm statement.
-			fprintf(fp, "\tasm(\"");
-			disasm_print_instr(fp, inst, false);
-			fprintf(fp, "\");\n");
-		}
-
-	}
+	if(SUBSADDR(sr) == sr->er->ctxt->entry)
+		fprintf(fp, "void _start()\n{\n");
+	else
+		fprintf(fp, "sub_%05x()\n{\n", IIDX2ADDR(sr->er, sr->sidx));
+	//Write blocks.
+	for(i = 0; i < sr->bblocks.size(); i++)
+		output_write_block(fp, sr->bblocks[i]);
 	//Write footer.
 	fprintf(fp, "}\n");
 }

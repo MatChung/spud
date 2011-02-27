@@ -29,7 +29,7 @@ int main(int argc, char **argv)
 	getchar();
 	spud_destroy_ctxt(ctxt);*/
 
-	ctxt_t *ctxt = spud_create_ctxt("test1");
+	ctxt_t *ctxt = spud_create_ctxt("test3");
 	
 	disasm_disassemble(ctxt);
 
