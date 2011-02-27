@@ -4271,9 +4271,10 @@ bool disasm_is_branch(instr_t *inst)
 	return false;
 }
 
+#define BRCNT 7
 bool disasm_is_direct_branch(instr_t *inst)
 {
-	static u32 branch_instrs[7] = 
+	static u32 branch_instrs[BRCNT] = 
 	{
 		INSTR_BR,
 		INSTR_BRA,
@@ -4286,15 +4287,17 @@ bool disasm_is_direct_branch(instr_t *inst)
 
 	int i;
 
-	for(i = 0; i < 7; i++)
+	for(i = 0; i < BRCNT; i++)
 		if(inst->instr == branch_instrs[i])
 			return true;
 	return false;
 }
+#undef BRCNT
 
+#define BRCNT 4
 bool disasm_is_direct_cond_branch(instr_t *inst)
 {
-	static u32 branch_instrs[7] = 
+	static u32 branch_instrs[BRCNT] = 
 	{
 		INSTR_BRHNZ,
 		INSTR_BRHZ,
@@ -4304,15 +4307,17 @@ bool disasm_is_direct_cond_branch(instr_t *inst)
 
 	int i;
 
-	for(i = 0; i < 7; i++)
+	for(i = 0; i < BRCNT; i++)
 		if(inst->instr == branch_instrs[i])
 			return true;
 	return false;
 }
+#undef BRCNT
 
+#define BRCNT 3
 bool disasm_is_direct_uncond_branch(instr_t *inst)
 {
-	static u32 branch_instrs[7] = 
+	static u32 branch_instrs[BRCNT] = 
 	{
 		INSTR_BR,
 		INSTR_BRA,
@@ -4321,8 +4326,9 @@ bool disasm_is_direct_uncond_branch(instr_t *inst)
 
 	int i;
 
-	for(i = 0; i < 7; i++)
+	for(i = 0; i < BRCNT; i++)
 		if(inst->instr == branch_instrs[i])
 			return true;
 	return false;
 }
+#undef BRCNT
