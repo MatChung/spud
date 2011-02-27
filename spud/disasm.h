@@ -236,5 +236,7 @@ void disasm_disassemble(struct _ctxt_t *ctxt);
 instr_t *disasm_get_instr(struct _execr_t *er, u32 addr);
 bool disasm_is_branch(instr_t *inst);
 bool disasm_is_direct_branch(instr_t *inst);
+bool disasm_is_direct_cond_branch(instr_t *inst);
+bool disasm_is_direct_uncond_branch(instr_t *inst);
 
 #endif

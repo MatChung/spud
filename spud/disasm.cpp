@@ -9,6 +9,7 @@
 #include <string.h>
 
 #include "common.h"
+#include "config.h"
 #include "types.h"
 #include "disasm.h"
 #include "spud.h"
@@ -4236,7 +4237,7 @@ instr_t *disasm_get_instr(execr_t *er, u32 addr)
 {
 	if(addr >= er->start && addr <= er->start + er->size)
 	{
-		unsigned int idx = (addr - er->start) / 4;
+		unsigned int idx = (addr - er->start) / INSTR_SIZE;
 		return &(er->instrs[idx]);
 	}
 
@@ -4281,6 +4282,41 @@ bool disasm_is_direct_branch(instr_t *inst)
 		INSTR_BRNZ,
 		INSTR_BRSL,
 		INSTR_BRZ
+	};
+
+	int i;
+
+	for(i = 0; i < 7; i++)
+		if(inst->instr == branch_instrs[i])
+			return true;
+	return false;
+}
+
+bool disasm_is_direct_cond_branch(instr_t *inst)
+{
+	static u32 branch_instrs[7] = 
+	{
+		INSTR_BRHNZ,
+		INSTR_BRHZ,
+		INSTR_BRNZ,
+		INSTR_BRZ
+	};
+
+	int i;
+
+	for(i = 0; i < 7; i++)
+		if(inst->instr == branch_instrs[i])
+			return true;
+	return false;
+}
+
+bool disasm_is_direct_uncond_branch(instr_t *inst)
+{
+	static u32 branch_instrs[7] = 
+	{
+		INSTR_BR,
+		INSTR_BRA,
+		INSTR_BRSL,
 	};
 
 	int i;

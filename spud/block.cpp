@@ -19,7 +19,7 @@ static block_t *_block_copy(block_t *bl)
 	return res;
 }
 
-static void _block_split_after(subroutine_t *sr, u32 target, list<block_t *>::iterator &it)
+static void _block_split(subroutine_t *sr, u32 target, list<block_t *>::iterator &it)
 {
 	block_t *tbl = *it;
 
@@ -48,7 +48,7 @@ static void _block_split_blocks(subroutine_t *sr)
 	//Outer and inner iterators.
 	list<block_t *>::iterator oit, iit;
 
-	for(oit = sr->blocks.begin(); oit != sr->blocks.end(); ++oit)
+	for(oit = sr->blocks.begin(); oit != sr->blocks.end() && (*oit)->type != BLOCK_END; ++oit)
 	{
 		block_t *bl = *oit;
 
@@ -57,22 +57,20 @@ static void _block_split_blocks(subroutine_t *sr)
 			u32 target = BRANCH_TARGET(bl->exitinst);
 
 			//Check for a branch target inside another block.
-			for(iit = sr->blocks.begin(); iit != sr->blocks.end(); ++iit)
+			for(iit = sr->blocks.begin(); iit != sr->blocks.end() && (*iit)->type != BLOCK_END; ++iit)
 			{
 				block_t *tbl = *iit;
 
 				//Don't check if the target is the first instruction.
 				if(target > BLOCKSADDR(tbl) && target <= BLOCKEADDR(tbl))
 				{
-					if(target > bl->exitinst->address)
+					if(bl != tbl)
 					{
-						_block_split_after(sr, target, iit);
+						_block_split(sr, target, iit);
 						break;
 					}
 					else
-					{
-						DBGPRINTF("block: todo: backward branches! (0x%05x)\n", target);
-					}
+						DBGPRINTF("block: todo: split self! (0x%05x)\n", target);
 				}
 			}
 		}
@@ -99,6 +97,7 @@ static block_t *_block_extract(subroutine_t *sr, unsigned int sidx)
 			res->sidx = sidx;
 			res->eidx = i;
 			res->exitinst = inst;
+			res->type = BLOCK_SIMPLE;
 			return res;
 		}
 	}
@@ -109,6 +108,8 @@ static block_t *_block_extract(subroutine_t *sr, unsigned int sidx)
 void block_extract_all(subroutine_t *sr)
 {
 	unsigned int i;
+
+	DBGPRINTF("block: extracting from sub @ 0x%05x\n", SUBSADDR(sr));
 
 	i = sr->sidx;
 	while(i <= sr->eidx)
@@ -124,6 +125,18 @@ void block_extract_all(subroutine_t *sr)
 		i++;
 	}
 
+	//Add end node.
+	block_t *end = new block_t;
+	end->sr = sr;
+	end->type = BLOCK_END;
+	end->sidx = sr->eidx;
+	end->eidx = sr->eidx;
+	end->exitinst = &(sr->er->instrs[end->eidx]);
+	sr->blocks.push_back(end);
+
 	//Split all blocks.
 	_block_split_blocks(sr);
+
+	//Mark first block as start.
+	sr->blocks.front()->type = BLOCK_START;
 }

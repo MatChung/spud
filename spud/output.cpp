@@ -54,7 +54,7 @@ void output_write_subroutine(FILE *fp, subroutine_t *sr)
 
 	//Write all blocks.
 	list<block_t *>::iterator iter;
-	for(iter = sr->blocks.begin(); iter != sr->blocks.end(); ++iter)
+	for(iter = sr->blocks.begin(); iter != sr->blocks.end() && (*iter)->type != BLOCK_END; ++iter)
 		output_write_block(fp, *iter);
 	
 	//Write footer.

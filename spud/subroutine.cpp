@@ -21,7 +21,7 @@ static void _subroutine_find_refs(ctxt_t *ctxt, subroutine_t *sr)
 		{
 			instr_t *inst = &(tsr->er->instrs[j]);
 			//Check for a relative branch to start of subroutine.
-			if(disasm_is_direct_branch(inst) && BRANCH_TARGET(inst) == IIDX2ADDR(sr->er, sr->sidx))
+			if(disasm_is_direct_branch(inst) && BRANCH_TARGET(inst) == SUBSADDR(sr))
 			{
 				DBGPRINTF("subroutine: found ref from sub @ 0x%05x (instr @ 0x%05x) to 0x%05x\n", 
 					SUBSADDR(tsr), IIDX2ADDR(tsr->er, j), SUBSADDR(sr));
@@ -64,7 +64,6 @@ static subroutine_t *_subroutine_extract(execr_t *er, unsigned int sidx)
 			res->er = er;
 			res->sidx = sidx;
 			res->eidx = i;
-			res->cfg = NULL;
 			return res;
 		}
 		//Discard subroutines with unknown instructions.

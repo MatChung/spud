@@ -16,6 +16,7 @@
 #include "disasm.h"
 #include "subroutine.h"
 #include "block.h"
+#include "cfg.h"
 #include "output.h"
 
 static void _elf_load_phdr(ctxt_t *ctxt, FILE *fp, u32 phdr_offset, u32 i)
@@ -141,5 +142,10 @@ void spud_decompile(ctxt_t *ctxt, const char *out)
 	for(i = 0; i < ctxt->subroutines.size(); i++)
 		block_extract_all(ctxt->subroutines[i]);
 
-	output_write(ctxt, "test1.txt");
+	//Build control flow graphs.
+	for(i = 0; i < ctxt->subroutines.size(); i++)
+		cfg_build(ctxt->subroutines[i]);
+
+	//Write decompiled source to output file.
+	output_write(ctxt, out);
 }

@@ -25,6 +25,7 @@ int main(int argc, char **argv)
 	spud_destroy_ctxt(ctxt);
 	*/
 
+	//ctxt_t *ctxt = spud_create_ctxt("../../isomodules/aim_spu_module.elf");
 	ctxt_t *ctxt = spud_create_ctxt("test3");
 	spud_decompile(ctxt, "test1.txt");
 	spud_destroy_ctxt(ctxt);
