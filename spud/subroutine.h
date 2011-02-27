@@ -7,10 +7,10 @@
 
 #include "spud.h"
 
+#define SUBSADDR(sr) IIDX2ADDR(sr->execr, sr->sidx)
+#define SUBEADDR(sr) IIDX2ADDR(sr->execr, sr->eidx)
+
 subroutine_t *subroutine_find_tsubref(subroutine_t *sr, u32 addr);
-void subroutine_find_refs(ctxt_t *ctxt, subroutine_t *sr);
-void subroutine_find_refs_all(ctxt_t *ctxt);
-subroutine_t *subroutine_extract(execr_t *er, int sidx);
 void subroutine_extract_all(ctxt_t *ctxt);
 
 #endif

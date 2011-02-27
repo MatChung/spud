@@ -6,6 +6,8 @@
 #include <stdlib.h>
 #include <stdarg.h>
 
+#include "config.h"
+
 void fail(const char *a, ...)
 {
 	char msg[1024];

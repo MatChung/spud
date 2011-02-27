@@ -5,25 +5,11 @@
 #include "common.h"
 #include "disasm.h"
 #include "spud.h"
+#include "subroutine.h"
 
-subroutine_t *subroutine_find_tsubref(subroutine_t *sr, u32 addr)
+static void _subroutine_find_refs(ctxt_t *ctxt, subroutine_t *sr)
 {
-	int i;
-
-	for(i = 0; i < sr->tsubrefs.size(); i++)
-	{
-		reference_t *ref = sr->tsubrefs[i];
-		//Check if the address matches a subroutine reference.
-		if(IIDX_TO_ADDR(ref->subroutine->execr, ref->refidx) == addr)
-			return ref->subroutine;
-	}
-
-	return NULL;
-}
-
-void subroutine_find_refs(ctxt_t *ctxt, subroutine_t *sr)
-{
-	int i, j;
+	unsigned int i, j;
 
 	//Check all subroutines.
 	for(i = 0; i < ctxt->subroutines.size(); i++)
@@ -34,10 +20,10 @@ void subroutine_find_refs(ctxt_t *ctxt, subroutine_t *sr)
 		{
 			instr_t *inst = &(tsr->execr->instrs[j]);
 			//Check for a relative branch to start of subroutine.
-			if(disasm_is_direct_branch(inst) && BRANCH_TARGET(inst) == IIDX_TO_ADDR(sr->execr, sr->sidx))
+			if(disasm_is_direct_branch(inst) && BRANCH_TARGET(inst) == IIDX2ADDR(sr->execr, sr->sidx))
 			{
-				DBGPRINTF("subroutines: found ref from sub @ 0x%05x (instr @ 0x%05x) to 0x%05x\n", 
-					IIDX_TO_ADDR(tsr->execr, tsr->sidx), IIDX_TO_ADDR(tsr->execr, j), IIDX_TO_ADDR(sr->execr, sr->sidx));
+				DBGPRINTF("subroutine: found ref from sub @ 0x%05x (instr @ 0x%05x) to 0x%05x\n", 
+					SUBSADDR(tsr), IIDX2ADDR(tsr->execr, j), SUBSADDR(sr));
 				//Add reference to referenced subroutine.
 				reference_t *ref = new reference_t;
 				ref->subroutine = tsr;
@@ -53,18 +39,18 @@ void subroutine_find_refs(ctxt_t *ctxt, subroutine_t *sr)
 	}
 }
 
-void subroutine_find_refs_all(ctxt_t *ctxt)
+static void _subroutine_find_refs_all(ctxt_t *ctxt)
 {
 	int i;
 
 	//Find references for all subroutines.
 	for(i = 0; i < ctxt->subroutines.size(); i++)
-		subroutine_find_refs(ctxt, ctxt->subroutines[i]);
+		_subroutine_find_refs(ctxt, ctxt->subroutines[i]);
 }
 
-subroutine_t *subroutine_extract(execr_t *er, int sidx)
+static subroutine_t *_subroutine_extract(execr_t *er, int sidx)
 {
-	int j;
+	unsigned int j;
 
 	for(j = sidx; j < er->instrs.size(); j++)
 	{
@@ -84,9 +70,24 @@ subroutine_t *subroutine_extract(execr_t *er, int sidx)
 	return NULL;
 }
 
+subroutine_t *subroutine_find_tsubref(subroutine_t *sr, u32 addr)
+{
+	int i;
+
+	for(i = 0; i < sr->tsubrefs.size(); i++)
+	{
+		reference_t *ref = sr->tsubrefs[i];
+		//Check if the address matches a subroutine reference.
+		if(IIDX2ADDR(ref->subroutine->execr, ref->refidx) == addr)
+			return ref->subroutine;
+	}
+
+	return NULL;
+}
+
 void subroutine_extract_all(ctxt_t *ctxt)
 {
-	int i, j;
+	unsigned int i, j;
 
 	//Check all executable ranges.
 	for(i = 0; i < ctxt->execrs.size(); i++)
@@ -100,11 +101,10 @@ void subroutine_extract_all(ctxt_t *ctxt)
 			if(er->instrs[j].instr != INSTR_NOP && er->instrs[j].instr != INSTR_LNOP)
 			{
 				//Extract next subroutine.
-				subroutine_t *sr = subroutine_extract(er, j);
+				subroutine_t *sr = _subroutine_extract(er, j);
 				if(sr != NULL)
 				{
-					DBGPRINTF("subroutines: found subroutine (start 0x%05x, end 0x%05x)\n", 
-						IIDX_TO_ADDR(er, sr->sidx), IIDX_TO_ADDR(er, sr->eidx));
+					DBGPRINTF("subroutine: found sub @ 0x%05x (end @ 0x%05x)\n", SUBSADDR(sr), SUBEADDR(sr));
 					//Move instruction index to subroutine end.
 					j = sr->eidx;
 					ctxt->subroutines.push_back(sr);
@@ -112,5 +112,18 @@ void subroutine_extract_all(ctxt_t *ctxt)
 			}
 			j++;
 		}
+	}
+
+	//Now find all references.
+	_subroutine_find_refs_all(ctxt);
+
+	//Check if every subroutine is reachable and mark them respective.
+	for(i = 0; i < ctxt->subroutines.size(); i++)
+	{
+		subroutine_t *sr = ctxt->subroutines[i];
+		sr->reachable = (sr->fsubrefs.size() == 0 && 
+			SUBSADDR(sr) != ctxt->entry ? false : true);
+		DBGPRINTF("subroutine: sub @ 0x%05x is %s\n", 
+			SUBSADDR(sr), (sr->reachable == true ? "reachable" : "not reachable"));
 	}
 }

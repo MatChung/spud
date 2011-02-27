@@ -1,1 +1,7 @@
 spud/spud
+Debug/
+spud/Debug/
+Release/
+spud/Release/
+ipch/
+spud.sdf

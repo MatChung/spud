@@ -1,1 +1,10 @@
 spu decompiler. sort of.
+========================
+
+This decompiles spu binaries (ELFs).
+
+Right now it finds subroutines and all references between them.
+It also tries to determine if a subroutine is reachable, but the problem of 
+plain statical analysis is, that it doesn't find indirect calls to subroutines.
+
+So please help me a little with this project :)

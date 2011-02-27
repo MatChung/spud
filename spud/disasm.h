@@ -226,7 +226,7 @@ typedef struct _instr_t
 } instr_t;
 
 #define BRANCH_TARGET(inst) (inst->address + inst->ri16.i16)
-#define IIDX_TO_ADDR(er, idx) (er->start + idx * sizeof(u32))
+#define IIDX2ADDR(er, idx) (er->start + idx * sizeof(u32))
 
 instr_t disasm_disassemble_instr(u32 instr);
 void disasm_print_instr(FILE *fp, instr_t *inst, bool print_addr);

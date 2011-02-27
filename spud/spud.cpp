@@ -98,7 +98,26 @@ ctxt_t *spud_create_ctxt(const char *elf)
 
 void spud_destroy_ctxt(ctxt_t *ctxt)
 {
+	unsigned int i, j;
+
 	if(ctxt->ls != NULL)
 		free(ctxt->ls);
+
+	for(i = 0; i < ctxt->execrs.size(); i++)
+		delete ctxt->execrs[i];
+
+	for(i = 0; i < ctxt->subroutines.size(); i++)
+	{
+		subroutine_t *sr = ctxt->subroutines[i];
+
+		for(j = 0; j < sr->tsubrefs.size(); j++)
+			delete sr->tsubrefs[j];
+		
+		for(j = 0; j < sr->fsubrefs.size(); j++)
+			delete sr->fsubrefs[j];
+
+		delete sr;
+	}
+
 	delete ctxt;
 }

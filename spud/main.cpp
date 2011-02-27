@@ -35,8 +35,6 @@ int main(int argc, char **argv)
 
 	//Extract all subroutines.
 	subroutine_extract_all(ctxt);
-	//Find all references.
-	subroutine_find_refs_all(ctxt);
 	
 	output_write(ctxt, "test1.txt");
 	

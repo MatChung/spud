@@ -26,21 +26,35 @@ typedef struct _reference_t
 	//Referencing subroutine.
 	struct _subroutine_t *subroutine;
 	//Referencing instruction index.
-	int refidx;
+	unsigned int refidx;
 } reference_t;
+
+typedef struct _block_t
+{
+	//Owning subroutine.
+	struct _subroutine_t *sr;
+	//Start instruction index.
+	unsigned int sidx;
+	//End instruction index.
+	unsigned int eidx;
+} block_t;
 
 typedef struct _subroutine_t
 {
 	//Owning executable range.
 	execr_t *execr;
 	//Start instruction index;
-	int sidx;
+	unsigned int sidx;
 	//End instruction index.
-	int eidx;
+	unsigned int eidx;
+	//Reachable?
+	bool reachable;
 	//References from other subroutines.
 	vector<reference_t *>fsubrefs;
 	//Reference to other subroutines.
 	vector<reference_t *>tsubrefs;
+	//Blocks.
+	vector<block_t *>blocks;
 } subroutine_t;
 
 typedef struct _ctxt_t

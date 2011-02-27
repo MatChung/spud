@@ -4208,7 +4208,7 @@ void disasm_print_instr(FILE *fp, instr_t *inst, bool print_addr)
 
 void disasm_disassemble(ctxt_t *ctxt)
 {
-	int i;
+	unsigned int i;
 	u32 instr, j, end;
 
 	for(i = 0; i < ctxt->execrs.size(); i++)

@@ -4,6 +4,7 @@
 
 #include <stdio.h>
 
+#include "config.h"
 #include "common.h"
 #include "spud.h"
 #include "disasm.h"
@@ -11,10 +12,12 @@
 
 void output_write_subroutine(FILE *fp, subroutine_t *sr)
 {
-	int i;
+	unsigned int i;
 
 	//Write header.
-	fprintf(fp, "sub_%05x()\n{\n", IIDX_TO_ADDR(sr->execr, sr->sidx));
+	if(sr->reachable == false)
+		fprintf(fp, "//Seems to be not reachable.\n");
+	fprintf(fp, "sub_%05x()\n{\n", IIDX2ADDR(sr->execr, sr->sidx));
 	//Write instructions for now.
 	for(i = sr->sidx; i <= sr->eidx; i++)
 	{
@@ -56,7 +59,7 @@ void output_write_subroutine(FILE *fp, subroutine_t *sr)
 
 void output_write(ctxt_t *ctxt, const char *file)
 {
-	int i;
+	unsigned int i;
 	FILE *fp = fopen(file, "w");
 
 	if((fp = fopen(file, "w")) == NULL)
