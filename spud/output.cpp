@@ -16,6 +16,7 @@ void output_write_block(FILE *fp, block_t *bl)
 
 	//Write header.
 	fprintf(fp, "\t//block @ %05x\n\t{\n", IIDX2ADDR(bl->sr->er, bl->sidx));
+
 	//Write instructions for now.
 	for(i = bl->sidx; i <= bl->eidx; i++)
 	{
@@ -36,15 +37,13 @@ void output_write_block(FILE *fp, block_t *bl)
 		}
 
 	}
-	//Write footer.
+
 	//Write footer.
 	fprintf(fp, "\t}\n");
 }
 
 void output_write_subroutine(FILE *fp, subroutine_t *sr)
 {
-	unsigned int i;
-
 	//Write header.
 	if(sr->reachable == false)
 		fprintf(fp, "//Seems to be not reachable.\n");
@@ -52,9 +51,12 @@ void output_write_subroutine(FILE *fp, subroutine_t *sr)
 		fprintf(fp, "void _start()\n{\n");
 	else
 		fprintf(fp, "sub_%05x()\n{\n", IIDX2ADDR(sr->er, sr->sidx));
-	//Write blocks.
-	for(i = 0; i < sr->bblocks.size(); i++)
-		output_write_block(fp, sr->bblocks[i]);
+
+	//Write all blocks.
+	list<block_t *>::iterator iter;
+	for(iter = sr->blocks.begin(); iter != sr->blocks.end(); ++iter)
+		output_write_block(fp, *iter);
+	
 	//Write footer.
 	fprintf(fp, "}\n");
 }

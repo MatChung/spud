@@ -13,6 +13,10 @@
 #include "types.h"
 #include "common.h"
 #include "spud.h"
+#include "disasm.h"
+#include "subroutine.h"
+#include "block.h"
+#include "output.h"
 
 static void _elf_load_phdr(ctxt_t *ctxt, FILE *fp, u32 phdr_offset, u32 i)
 {
@@ -121,4 +125,21 @@ void spud_destroy_ctxt(ctxt_t *ctxt)
 	}
 
 	delete ctxt;
+}
+
+void spud_decompile(ctxt_t *ctxt, const char *out)
+{
+	unsigned int i;
+
+	//Disassemble executable regions.
+	disasm_disassemble(ctxt);
+
+	//Extract all subroutines.
+	subroutine_extract_all(ctxt);
+	
+	//Extract all blocks.
+	for(i = 0; i < ctxt->subroutines.size(); i++)
+		block_extract_all(ctxt->subroutines[i]);
+
+	output_write(ctxt, "test1.txt");
 }

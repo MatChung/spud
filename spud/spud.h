@@ -7,6 +7,8 @@
 
 #include <vector>
 using std::vector;
+#include <list>
+using std::list;
 
 #include "types.h"
 #include "disasm.h"
@@ -41,8 +43,6 @@ typedef struct _block_t
 	unsigned int eidx;
 	//Exit instruction.
 	instr_t *exitinst;
-	//Next block.
-	struct _block_t *next;
 } block_t;
 
 typedef struct _subroutine_t
@@ -59,10 +59,8 @@ typedef struct _subroutine_t
 	vector<reference_t *>fsubrefs;
 	//Reference to other subroutines.
 	vector<reference_t *>tsubrefs;
-	//Basic blocks.
-	vector<block_t *>bblocks;
-	//Control flow graph.
-	block_t *cfg;
+	//Blocks.
+	list<block_t *>blocks;
 } subroutine_t;
 
 typedef struct _ctxt_t
@@ -79,5 +77,6 @@ typedef struct _ctxt_t
 
 ctxt_t *spud_create_ctxt(const char *elf);
 void spud_destroy_ctxt(ctxt_t *ctxt);
+void spud_decompile(ctxt_t *ctxt, const char *out);
 
 #endif

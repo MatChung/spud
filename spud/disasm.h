@@ -180,6 +180,8 @@ typedef struct _instr_t
 	u32 opcode;
 	//Address.
 	u32 address;
+	//Index in owning executable region.
+	u32 idx;
 	//Parameters.
 	union
 	{
@@ -231,6 +233,7 @@ typedef struct _instr_t
 instr_t disasm_disassemble_instr(u32 instr);
 void disasm_print_instr(FILE *fp, instr_t *inst, bool print_addr);
 void disasm_disassemble(struct _ctxt_t *ctxt);
+instr_t *disasm_get_instr(struct _execr_t *er, u32 addr);
 bool disasm_is_branch(instr_t *inst);
 bool disasm_is_direct_branch(instr_t *inst);
 

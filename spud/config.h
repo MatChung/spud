@@ -9,5 +9,6 @@
 #define _CRT_SECURE_NO_WARNINGS
 
 #define LS_SIZE (256 * 1024)
+#define INSTR_SIZE sizeof(u32)
 
 #endif

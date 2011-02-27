@@ -4208,7 +4208,7 @@ void disasm_print_instr(FILE *fp, instr_t *inst, bool print_addr)
 
 void disasm_disassemble(ctxt_t *ctxt)
 {
-	unsigned int i;
+	unsigned int i, k;
 	u32 instr, j, end;
 
 	for(i = 0; i < ctxt->execrs.size(); i++)
@@ -4216,7 +4216,7 @@ void disasm_disassemble(ctxt_t *ctxt)
 		execr_t *er = ctxt->execrs[i];
 		end = er->start + er->size;
 		DBGPRINTF("disasm: disassembling from 0x%08x to 0x%08x\n", er->start, end);
-		for(j = er->start; j < end; j += sizeof(u32))
+		for(j = er->start, k = 0; j < end; j += sizeof(u32), k++)
 		{
 			//Read instruction from LS.
 			instr = be32(ctxt->ls + j);
@@ -4224,10 +4224,23 @@ void disasm_disassemble(ctxt_t *ctxt)
 			instr_t inst = disasm_disassemble_instr(instr);
 			//Set address.
 			inst.address = j;
+			//Set index.
+			inst.idx = k;
 
 			er->instrs.push_back(inst);
 		}
 	}
+}
+
+instr_t *disasm_get_instr(execr_t *er, u32 addr)
+{
+	if(addr >= er->start && addr <= er->start + er->size)
+	{
+		unsigned int idx = (addr - er->start) / 4;
+		return &(er->instrs[idx]);
+	}
+
+	return NULL;
 }
 
 bool disasm_is_branch(instr_t *inst)

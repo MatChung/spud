@@ -58,9 +58,7 @@ static subroutine_t *_subroutine_extract(execr_t *er, unsigned int sidx)
 		instr_t *inst = &(er->instrs[i]);
 		//Try to find a bi $lr instruction for now.
 		//A subroutine could also have more than one bi $lr, check this later.
-		//Also check for stop instruction as subroutine end.
-		if((inst->instr == INSTR_BI && inst->rr.rt == REG_LR) ||
-			inst->instr == INSTR_STOP)
+		if(inst->instr == INSTR_BI && inst->rr.rt == REG_LR)
 		{
 			subroutine_t *res = new subroutine_t;
 			res->er = er;
@@ -139,8 +137,4 @@ void subroutine_extract_all(ctxt_t *ctxt)
 		DBGPRINTF("subroutine: sub @ 0x%05x is %s\n", 
 			SUBSADDR(sr), (sr->reachable == true ? "reachable" : "not reachable"));
 	}
-
-	//Extract all blocks.
-	for(i = 0; i < ctxt->subroutines.size(); i++)
-		block_extract_all(ctxt->subroutines[i]);
 }

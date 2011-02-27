@@ -50,6 +50,9 @@ sub_00000()
 		asm("cwd      $4, $1, 0x0");
 		asm("shufb    $2, $3, $2, $4");
 		asm("stqd     $2, $1, 0x20");
+	}
+	//block @ 000ac
+	{
 		asm("lqd      $2, $1, 0x20");
 		asm("cgti     $2, $2, 0x0");
 		asm("brnz     $2, 0x3c");
@@ -122,6 +125,9 @@ void _start()
 		asm("cwd      $4, $1, 0x0");
 		asm("shufb    $2, $3, $2, $4");
 		asm("stqd     $2, $1, 0x50");
+	}
+	//block @ 00198
+	{
 		asm("lqd      $2, $1, 0x50");
 		asm("cgti     $2, $2, 0x9");
 		asm("brz      $2, 0x148");
@@ -135,35 +141,9 @@ void _start()
 		asm("shufb    $2, $3, $2, $4");
 		asm("stqd     $2, $1, 0x40");
 		asm("stop     ");
-	}
-}
-
-//Seems to be not reachable.
-sub_001c0()
-{
-	//block @ 001c0
-	{
 		asm("ai       $1, $1, 0x60");
 		asm("lqd      $0, $1, 0x10");
 		asm("bi       $0, $0, $0");
-	}
-}
-
-//Seems to be not reachable.
-sub_001d8()
-{
-	//block @ 001d8
-	{
-		asm("stop     ");
-	}
-}
-
-//Seems to be not reachable.
-sub_001dc()
-{
-	//block @ 001dc
-	{
-		asm("stop     ");
 	}
 }
 
