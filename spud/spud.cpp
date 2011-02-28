@@ -122,6 +122,14 @@ void spud_destroy_ctxt(ctxt_t *ctxt)
 		for(j = 0; j < sr->fsubrefs.size(); j++)
 			delete sr->fsubrefs[j];
 
+		//FIXME
+		//list<block_t *>::iterator it;
+		//for(it = sr->blocks.begin(); it != sr->blocks.end(); i++)
+			//delete (*it);
+
+		for(j = 0; j < sr->edges.size(); j++)
+			delete sr->edges[j];
+
 		delete sr;
 	}
 
@@ -143,8 +151,7 @@ void spud_decompile(ctxt_t *ctxt, const char *out)
 		block_extract_all(ctxt->subroutines[i]);
 
 	//Build control flow graphs.
-	for(i = 0; i < ctxt->subroutines.size(); i++)
-		cfg_build(ctxt->subroutines[i]);
+	cfg_build_all(ctxt);
 
 	//Write decompiled source to output file.
 	output_write(ctxt, out);

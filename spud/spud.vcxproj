@@ -81,6 +81,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="output.cpp" />
     <ClCompile Include="spud.cpp" />
+    <ClCompile Include="structs.cpp" />
     <ClCompile Include="subroutine.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -91,6 +92,7 @@
     <ClInclude Include="disasm.h" />
     <ClInclude Include="output.h" />
     <ClInclude Include="spud.h" />
+    <ClInclude Include="structs.h" />
     <ClInclude Include="subroutine.h" />
     <ClInclude Include="types.h" />
   </ItemGroup>

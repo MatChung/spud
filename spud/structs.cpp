@@ -2,10 +2,10 @@
 // Licensed under the terms of the GNU GPL, version 2
 // http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt
 
-#ifndef _CFG_H_
-#define _CFG_H_
+#include "common.h"
+#include "subroutine.h"
 
-void cfg_build(subroutine_t *sr);
-void cfg_build_all(ctxt_t *ctxt);
-
-#endif
+void structs_extract(subroutine_t *sr)
+{
+	//Walk the control flow graph.
+}

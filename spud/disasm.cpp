@@ -4162,47 +4162,50 @@ instr_t disasm_disassemble_instr(u32 instr)
 	return res;
 }
 
+void disasm_print_imm(FILE *fp, s32 imm)
+{
+	if(imm < 0)
+		fprintf(fp, "-0x%x", (u32)(-imm));
+	else
+		fprintf(fp, "0x%x", imm);
+}
+
 void disasm_print_instr(FILE *fp, instr_t *inst, bool print_addr)
 {
 	if(print_addr)
-		fprintf(fp, "0x%05x %-8s ", inst->address, inst->name);
+		fprintf(fp, "0x%05x %-7s", inst->address, inst->name);
 	else
-		fprintf(fp, "%-8s ", inst->name);
+		fprintf(fp, "%-7s", inst->name);
+
 	switch(inst->type)
 	{
 	case SPU_INSTR_RR:
-		fprintf(fp, "$%d, $%d, $%d", inst->rr.rt, inst->rr.ra, inst->rr.rb);
+		fprintf(fp, " $%d, $%d, $%d", inst->rr.rt, inst->rr.ra, inst->rr.rb);
 		break;
 	case SPU_INSTR_RRR:
-		fprintf(fp, "$%d, $%d, $%d, $%d", inst->rrr.rt, inst->rrr.ra, inst->rrr.rb, inst->rrr.rc);
+		fprintf(fp, " $%d, $%d, $%d, $%d", inst->rrr.rt, inst->rrr.ra, inst->rrr.rb, inst->rrr.rc);
 		break;
 	case SPU_INSTR_RI7:
-		if(((s32)inst->ri7.i7) < 0)
-			fprintf(fp, "$%d, $%d, -0x%x", inst->ri7.rt, inst->ri7.ra, (u32)(-((s32)inst->ri7.i7)));
-		else
-			fprintf(fp, "$%d, $%d, 0x%x", inst->ri7.rt, inst->ri7.ra, inst->ri7.i7);
+		fprintf(fp, " $%d, $%d, ", inst->ri7.rt, inst->ri7.ra);
+		disasm_print_imm(fp, inst->ri7.i7);
 		break;
 	case SPU_INSTR_RI10:
-		if(((s32)inst->ri7.i7) < 0)
-			fprintf(fp, "$%d, $%d, -0x%x", inst->ri10.rt, inst->ri10.ra, (u32)(-((s32)inst->ri10.i10)));
-		else
-			fprintf(fp, "$%d, $%d, 0x%x", inst->ri10.rt, inst->ri10.ra, inst->ri10.i10);
+		fprintf(fp, " $%d, $%d, ", inst->ri10.rt, inst->ri10.ra);
+		disasm_print_imm(fp, inst->ri10.i10);
 		break;
 	case SPU_INSTR_RI16:
 		if(inst->name[0] == 'b' && inst->name[1] == 'r')
-			fprintf(fp, "$%d, 0x%x", inst->ri16.rt, inst->address + inst->ri16.i16);
-		else if(strcmp(inst->name, "lqr") == 0)
-			fprintf(fp, "$%d, 0x%x", inst->ri16.rt, inst->address + inst->ri16.i16);
-		else if(strcmp(inst->name, "stqr") == 0)
-			fprintf(fp, "$%d, 0x%x", inst->ri16.rt, inst->address + inst->ri16.i16);
+			fprintf(fp, " $%d, 0x%x", inst->ri16.rt, inst->address + inst->ri16.i16);
+		else if(inst->instr == INSTR_LQR)
+			fprintf(fp, " $%d, 0x%x", inst->ri16.rt, inst->address + inst->ri16.i16);
+		else if(inst->instr == INSTR_STQR)
+			fprintf(fp, " $%d, 0x%x", inst->ri16.rt, inst->address + inst->ri16.i16);
 		else
-			fprintf(fp, "$%d, 0x%x", inst->ri16.rt, inst->ri16.i16);
+			fprintf(fp, " $%d, 0x%x", inst->ri16.rt, inst->ri16.i16);
 		break;
 	case SPU_INSTR_RI18:
-		if(((s32)inst->ri18.i18) < 0)
-			fprintf(fp, "$%d, -0x%x", inst->ri18.rt, (u32)(-((s32)inst->ri18.i18)));
-		else
-			fprintf(fp, "$%d, 0x%x", inst->ri18.rt, inst->ri18.i18);
+		fprintf(fp, " $%d, ", inst->ri18.rt);
+		disasm_print_imm(fp, inst->ri18.i18);
 		break;
 	}
 }

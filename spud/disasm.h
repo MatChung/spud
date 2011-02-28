@@ -230,6 +230,8 @@ typedef struct _instr_t
 #define BRANCH_TARGET(inst) (inst->address + inst->ri16.i16)
 #define IIDX2ADDR(er, idx) (er->start + idx * sizeof(u32))
 
+#define IS_RETURN(inst) (inst->instr == INSTR_BI && inst->rr.rt == REG_LR)
+
 instr_t disasm_disassemble_instr(u32 instr);
 void disasm_print_instr(FILE *fp, instr_t *inst, bool print_addr);
 void disasm_disassemble(struct _ctxt_t *ctxt);

@@ -37,10 +37,12 @@ typedef struct _reference_t
 #define EDGE_BRANCH 1
 //Go to the next node under some condition.
 #define EDGE_BRANCH_COND 2
-//Return.
-#define EDGE_RETURN 3
+//Exit.
+#define EDGE_EXIT 3
+//Next.
+#define EDGE_NEXT 4
 //Error.
-#define EDGE_ERROR 4
+#define EDGE_ERROR 5
 
 typedef struct _edge_t
 {
@@ -54,8 +56,8 @@ typedef struct _edge_t
 
 //Simple block.
 #define BLOCK_SIMPLE 0
-//Start block.
-#define BLOCK_START 1
+//Call block.
+#define BLOCK_CALL 1
 //End block.
 #define BLOCK_END 2
 

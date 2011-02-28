@@ -84,20 +84,23 @@ static block_t *_block_extract(subroutine_t *sr, unsigned int sidx)
 	for(i = sidx; i <= sr->eidx; i++)
 	{
 		instr_t *inst = &(sr->er->instrs[i]);
-		//Check if a branch occurs to a target inside the subroutine 
-		//or if we are at the end of the subroutine because we need 
-		//at least one block per subroutine.
-		if((disasm_is_direct_branch(inst) && 
-			BRANCH_TARGET(inst) >= SUBSADDR(sr) &&
-			BRANCH_TARGET(inst) <= SUBEADDR(sr)) ||
-			i == sr->eidx)
+
+		//Check for a direct branch or if we are at the end of the 
+		//subroutine because we need at least one block per subroutine.
+		if(disasm_is_direct_branch(inst) || i == sr->eidx)
 		{
 			block_t *res = new block_t;
 			res->sr = sr;
 			res->sidx = sidx;
 			res->eidx = i;
 			res->exitinst = inst;
-			res->type = BLOCK_SIMPLE;
+			
+			//Check if the branch occurs to a target inside the subroutine.
+			if((BRANCH_TARGET(inst) >= SUBSADDR(sr) && 
+				BRANCH_TARGET(inst) <= SUBEADDR(sr)))
+				res->type = BLOCK_SIMPLE;
+			else //Otherwise the branch is a call to another subroutine.
+				res->type = BLOCK_CALL;
 			return res;
 		}
 	}
@@ -136,7 +139,4 @@ void block_extract_all(subroutine_t *sr)
 
 	//Split all blocks.
 	_block_split_blocks(sr);
-
-	//Mark first block as start.
-	sr->blocks.front()->type = BLOCK_START;
 }

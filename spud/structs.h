@@ -2,10 +2,7 @@
 // Licensed under the terms of the GNU GPL, version 2
 // http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt
 
-#ifndef _CFG_H_
-#define _CFG_H_
-
-void cfg_build(subroutine_t *sr);
-void cfg_build_all(ctxt_t *ctxt);
+#ifndef _STRUCTS_H_
+#define _STRUCTS_H_
 
 #endif

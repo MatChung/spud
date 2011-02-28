@@ -35,7 +35,6 @@ void output_write_block(FILE *fp, block_t *bl)
 			disasm_print_instr(fp, inst, false);
 			fprintf(fp, "\");\n");
 		}
-
 	}
 
 	//Write footer.

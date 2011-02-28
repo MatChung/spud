@@ -58,7 +58,7 @@ static subroutine_t *_subroutine_extract(execr_t *er, unsigned int sidx)
 		instr_t *inst = &(er->instrs[i]);
 		//Try to find a bi $lr instruction for now.
 		//A subroutine could also have more than one bi $lr, check this later.
-		if(inst->instr == INSTR_BI && inst->rr.rt == REG_LR)
+		if(IS_RETURN(inst))
 		{
 			subroutine_t *res = new subroutine_t;
 			res->er = er;
